@@ -3,7 +3,7 @@
 nextflow.enable.dsl=2
 
 process makeblastdb {
-    publishDir "$params.outdir/", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
     input: path(db_fasta)
     output: tuple path("${db_fasta}"), path("${db_fasta}*")
     script:
@@ -14,20 +14,21 @@ process makeblastdb {
 }
 
 process blastn {
-    publishDir "$params.outdir/", mode: 'copy'
+    publishDir "${params.outdir}", mode: 'copy'
     input: tuple path(db_fasta), path(db_indexed), path(query_fasta)
     output: path("*_blastout.txt")
     script:
     """
     #! /usr/bin/env bash
+#    PROC=\$((`nproc`))
     blastn \
-      -num_treads ${params.threads} \
       -db $db_fasta \
       -query $query_fasta \
       -outfmt 6 \
       -out ${query_fasta.baseName}_blastout.txt
     """
 }
+// -num_threads \$PROC \
 
 workflow {
   /* input channels */
@@ -35,5 +36,5 @@ workflow {
   query_ch = channel.fromPath(params.query, checkIfExists:true) 
   
   /* run blast */
-  db_ch | makeblastdb | combine(query_ch) | blastn | view
+  db_ch | makeblastdb | combine(query_ch) | blastn
 }
