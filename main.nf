@@ -21,6 +21,7 @@ process blastn {
     """
     #! /usr/bin/env bash
     blastn \
+      -num_treads ${params.threads} \
       -db $db_fasta \
       -query $query_fasta \
       -outfmt 6 \
