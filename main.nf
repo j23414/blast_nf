@@ -2,6 +2,8 @@
 
 nextflow.enable.dsl=2
 
+
+
 process makeblastdb {
     publishDir "${params.outdir}", mode: 'copy'
     input: path(db_fasta)
@@ -9,7 +11,7 @@ process makeblastdb {
     script:
     """
     #! /usr/bin/env bash
-    makeblastdb -in ${db_fasta} -dbtype nucl
+    ${makeblastdb_app} -in ${db_fasta} -dbtype nucl
     """
 }
 
@@ -21,10 +23,10 @@ process blastn {
     """
     #! /usr/bin/env bash
 #    PROC=\$((`nproc`))
-    blastn \
+    ${blastn_app} \
       -db $db_fasta \
       -query $query_fasta \
-      -outfmt 6 \
+      ${blastn_options} \
       -out ${query_fasta.baseName}_blastout.txt
     """
 }
